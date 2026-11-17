@@ -121,27 +121,27 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
             ?>
             <div class="row g-4">
                 <?php if ($result && $result->num_rows > 0):
-                    while ($m = $result->fetch_assoc()): ?>
+                    while ($menu = $result->fetch_assoc()): ?>
                         <div class="col-md-4">
                             <div class="card-menu">
-                                <?php if (!empty($m['gambar']) && file_exists('images/' . $m['gambar'])): ?>
-                                    <img src="images/<?= htmlspecialchars($m['gambar']) ?>"
-                                        alt="<?= htmlspecialchars($m['nama']) ?>"
+                                <?php if (!empty($menu['gambar']) && file_exists('images/' . $menu['gambar'])): ?>
+                                    <img src="images/<?= htmlspecialchars($menu['gambar']) ?>"
+                                        alt="<?= htmlspecialchars($menu['nama']) ?>"
                                         style="width:100%;height:150px;object-fit:cover;">
                                 <?php else: ?>
                                     <div class="card-img-placeholder">
-                                        <?= $m['kategori'] === 'makanan' ? '🍽️' : '🥤' ?>
+                                        <?= $menu['kategori'] === 'makanan' ? '🍽️' : '🥤' ?>
                                     </div>
                                 <?php endif; ?>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="card-title mb-0"><?= htmlspecialchars($m['nama']) ?></h6>
-                                        <span class="badge-kategori badge-<?= $m['kategori'] ?>">
-                                            <?= ucfirst($m['kategori']) ?>
+                                        <h6 class="card-title mb-0"><?= htmlspecialchars($menu['nama']) ?></h6>
+                                        <span class="badge-kategori badge-<?= $menu['kategori'] ?>">
+                                            <?= ucfirst($menu['kategori']) ?>
                                         </span>
                                     </div>
-                                    <p class="card-text"><?= htmlspecialchars($m['deskripsi']) ?></p>
-                                    <div class="harga-menu mt-2">Rp <?= number_format($m['harga'], 0, ',', '.') ?></div>
+                                    <p class="card-text"><?= htmlspecialchars($menu['deskripsi']) ?></p>
+                                    <div class="harga-menu mt-2">Rp <?= number_format($menu['harga'], 0, ',', '.') ?></div>
                                 </div>
                             </div>
                         </div>

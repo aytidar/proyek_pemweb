@@ -8,15 +8,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'pelanggan') {
 
 require_once '../backend/koneksi.php';
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int) $_SESSION['user_id'];
 $error   = htmlspecialchars($_GET['error']);
 $success = htmlspecialchars($_GET['success']);
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->bind_param('i', $user_id);
-$stmt->execute();
-$user = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+$query = mysqli_query($conn, "SELECT * FROM users WHERE id = '$user_id'");
+$user = mysqli_fetch_assoc($query);
 ?>
 
 <!DOCTYPE html>

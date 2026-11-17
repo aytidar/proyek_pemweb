@@ -9,32 +9,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'pelanggan') {
 require_once '../backend/koneksi.php';
 
 $user_id = $_SESSION['user_id'];
-$success = htmlspecialchars($_GET['success'] ?? '');
+$success = htmlspecialchars($_GET['success']);
 
-$stmt = $conn->prepare(
-    "SELECT * FROM reservasi WHERE user_id = ? ORDER BY created_at DESC"
-);
-$stmt->bind_param('i', $user_id);
-$stmt->execute();
-$reservasi_list = $stmt->get_result();
-$stmt->close();
-
-function badgeStatus($status)
-{
-    $map = [
-        'menunggu' => 'status-menunggu',
-        'diterima' => 'status-diterima',
-        'ditolak'  => 'status-ditolak',
-    ];
-    $label = [
-        'menunggu' => '⏳ Menunggu',
-        'diterima' => '✅ Diterima',
-        'ditolak'  => '❌ Ditolak',
-    ];
-    $class = $map[$status] ?? 'status-menunggu';
-    $text  = $label[$status] ?? ucfirst($status);
-    return "<span class=\"$class\">$text</span>";
-}
+$reservasi_list = mysqli_query( $conn, "SELECT * FROM reservasi WHERE user_id = '$user_id' ORDER BY created_at DESC");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -97,22 +74,37 @@ function badgeStatus($status)
                         </thead>
                         <tbody>
                             <?php $no = 1;
-                            while ($r = $reservasi_list->fetch_assoc()): ?>
+                            while ($reservasi = $reservasi_list->fetch_assoc()): ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
-                                    <td><?= date('d M Y', strtotime($r['tanggal'])) ?></td>
-                                    <td><?= date('H:i', strtotime($r['jam'])) ?> WIB</td>
-                                    <td><?= $r['jumlah_orang'] ?> orang</td>
+                                    <td><?= date('d M Y', strtotime($reservasi['tanggal'])) ?></td>
+                                    <td><?= date('H:i', strtotime($reservasi['jam'])) ?> WIB</td>
+                                    <td><?= $reservasi['jumlah_orang'] ?> orang</td>
                                     <td>
-                                        <?php if (!empty($r['paket']) && $r['paket'] !== 'Tanpa Paket'): ?>
-                                            <span class="status-diterima"><?= htmlspecialchars($r['paket']) ?></span>
+                                        <?php if (!empty($reservasi['paket']) && $reservasi['paket'] !== 'Tanpa Paket'): ?>
+                                            <span class="status-diterima"><?= htmlspecialchars($reservasi['paket']) ?></span>
                                         <?php else: ?>
                                             <span class="text-muted small">Tanpa Paket</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= $r['catatan'] ? htmlspecialchars($r['catatan']) : '<span class="text-muted">-</span>' ?></td>
-                                    <td><?= badgeStatus($r['status']) ?></td>
-                                    <td><small class="text-muted"><?= date('d/m/Y H:i', strtotime($r['created_at'])) ?></small></td>
+                                    <td><?= $reservasi['catatan'] ? htmlspecialchars($reservasi['catatan']) : '<span class="text-muted">-</span>' ?></td>
+                                    <td>
+                                        <?php if ($reservasi['status'] == 'menunggu'): ?>
+                                            <span class="status-menunggu">⏳ Menunggu</span>
+
+                                        <?php elseif ($reservasi['status'] == 'diterima'): ?>
+                                            <span class="status-diterima">✅ Diterima</span>
+
+                                        <?php elseif ($reservasi['status'] == 'ditolak'): ?>
+                                            <span class="status-ditolak">❌ Ditolak</span>
+
+                                        <?php else: ?>
+                                            <span class="status-menunggu">
+                                                <?= htmlspecialchars(ucfirst($reservasi['status'])) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><small class="text-muted"><?= date('d/m/Y H:i', strtotime($reservasi['created_at'])) ?></small></td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>
